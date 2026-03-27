@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Estimate the hidden electricity cost of devices left on standby — phantom power calculator for Indian households." />
+  <title>Phantom Power Cost Estimator</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── Sticky Header ───────────────────────────────────────────────────── -->
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon" aria-hidden="true">👻</span>
+        <div class="logo-text">
+          <span class="logo-title">PhantomPower</span>
+          <span class="logo-tagline">Stop the silent drain</span>
+        </div>
+      </div>
+      <button
+        id="theme-toggle"
+        class="theme-toggle"
+        aria-label="Toggle dark mode"
+        aria-pressed="false"
+        type="button"
+      >
+        <span class="theme-icon" aria-hidden="true">🌙</span>
+        <span class="theme-label">Dark Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ── Hero ────────────────────────────────────────────────────────────── -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-inner">
+        <h1 id="hero-heading" class="hero-headline">
+          Your devices never truly switch off.
+        </h1>
+        <p class="hero-sub">
+          Phantom power — also called standby or vampire power — is the electricity
+          consumed by appliances even when they appear to be off.
+        </p>
+        <p class="hero-desc">
+          In India, standby power accounts for up to <strong>10%</strong> of a
+          household's electricity bill. A set-top box alone can draw
+          <strong>15 W</strong> around the clock. This tool helps you see exactly
+          what your idle devices are costing you — in rupees, in carbon, and in trees.
+        </p>
+        <a href="#calculator" class="btn btn-primary hero-cta">Calculate my phantom cost</a>
+      </div>
+    </section>
+
+    <!-- ── Calculator ──────────────────────────────────────────────────────── -->
+    <section id="calculator" class="calculator-section" aria-labelledby="calc-heading">
+      <div class="section-inner">
+        <h2 id="calc-heading" class="section-title">Appliance Calculator</h2>
+
+        <!-- Rate input -->
+        <div class="rate-row">
+          <label for="rate" class="rate-label">
+            Electricity Tariff
+            <span class="helper-text">Check your electricity bill for the per-unit rate</span>
+          </label>
+          <div class="rate-input-wrap">
+            <span class="rate-prefix" aria-hidden="true">₹</span>
+            <input
+              type="number"
+              id="rate"
+              name="rate"
+              class="rate-input"
+              min="0"
+              step="0.01"
+              value="8"
+              aria-describedby="rate-hint"
+            />
+            <span class="rate-suffix">/kWh</span>
+          </div>
+          <span id="rate-hint" class="helper-text">Average Indian household tariff: ₹6–₹10/kWh</span>
+        </div>
+
+        <!-- Category filter tabs -->
+        <div class="category-tabs" role="tablist" aria-label="Filter appliances by category">
+          <button class="tab-btn active" role="tab" aria-selected="true"  data-category="All"           type="button">All</button>
+          <button class="tab-btn"        role="tab" aria-selected="false" data-category="Entertainment" type="button">📺 Entertainment</button>
+          <button class="tab-btn"        role="tab" aria-selected="false" data-category="Kitchen"       type="button">🍳 Kitchen</button>
+          <button class="tab-btn"        role="tab" aria-selected="false" data-category="Computing"     type="button">💻 Computing</button>
+          <button class="tab-btn"        role="tab" aria-selected="false" data-category="Cooling"       type="button">❄️ Cooling</button>
+          <button class="tab-btn"        role="tab" aria-selected="false" data-category="Networking"    type="button">📶 Networking</button>
+        </div>
+
+        <!-- Add appliance form -->
+        <form id="device-form" class="add-form" novalidate aria-label="Add an appliance">
+          <div class="form-row">
+            <label for="device-select" class="sr-only">Select appliance</label>
+            <select id="device-select" name="device" class="appliance-select" required></select>
+
+            <label for="hours-standby" class="sr-only">Standby hours per day</label>
+            <div class="hours-wrap">
+              <input
+                type="number"
+                id="hours-standby"
+                name="hours-standby"
+                class="hours-input"
+                min="0"
+                max="24"
+                value="20"
+                aria-label="Standby hours per day"
+              />
+              <span class="input-suffix">hrs/day</span>
+            </div>
+
+            <!-- Quantity stepper -->
+            <div class="qty-stepper" role="group" aria-label="Quantity">
+              <button type="button" class="qty-btn" id="qty-dec" aria-label="Decrease quantity">−</button>
+              <input
+                type="number"
+                id="quantity"
+                name="quantity"
+                class="qty-input"
+                min="1"
+                max="99"
+                value="1"
+                aria-label="Quantity"
+              />
+              <button type="button" class="qty-btn" id="qty-inc" aria-label="Increase quantity">+</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="add-btn">Add Appliance</button>
+          </div>
+        </form>
+
+        <!-- Added appliances list -->
+        <div id="appliance-list" class="appliance-list" aria-label="Added appliances" aria-live="polite">
+          <p class="empty-state" id="empty-msg">No appliances added yet. Select one above to get started.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Results ──────────────────────────────────────────────────────────── -->
+    <section id="results" class="results-section" aria-labelledby="results-heading">
+      <div class="section-inner">
+        <h2 id="results-heading" class="section-title">Your Phantom Power Impact</h2>
+
+        <div class="metrics-grid">
+          <article class="metric-card" aria-labelledby="metric-annual-label">
+            <span class="metric-icon" aria-hidden="true">💸</span>
+            <span class="metric-label" id="metric-annual-label">Annual Cost</span>
+            <span class="metric-value" id="total-yearly">₹0.00</span>
+            <span class="metric-sub">per year</span>
+          </article>
+
+          <article class="metric-card" aria-labelledby="metric-monthly-label">
+            <span class="metric-icon" aria-hidden="true">📅</span>
+            <span class="metric-label" id="metric-monthly-label">Monthly Cost</span>
+            <span class="metric-value" id="total-monthly">₹0.00</span>
+            <span class="metric-sub">per month</span>
+          </article>
+
+          <article class="metric-card" aria-labelledby="metric-co2-label">
+            <span class="metric-icon" aria-hidden="true">🌫️</span>
+            <span class="metric-label" id="metric-co2-label">CO₂ Emitted</span>
+            <span class="metric-value" id="total-co2">0.00 kg</span>
+            <span class="metric-sub">per year · BEE factor 0.82</span>
+          </article>
+
+          <article class="metric-card" aria-labelledby="metric-trees-label">
+            <span class="metric-icon" aria-hidden="true">🌳</span>
+            <span class="metric-label" id="metric-trees-label">Trees Required</span>
+            <span class="metric-value" id="total-trees">0</span>
+            <span class="metric-sub">to offset your emissions</span>
+          </article>
+        </div>
+
+        <!-- Detailed breakdown table -->
+        <div class="table-wrap">
+          <table id="device-table" aria-label="Appliance cost breakdown">
+            <thead>
+              <tr>
+                <th scope="col">Appliance</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Standby (W)</th>
+                <th scope="col">Hrs/Day</th>
+                <th scope="col">Monthly (₹)</th>
+                <th scope="col">Annual (₹)</th>
+                <th scope="col"><span class="sr-only">Remove</span></th>
+              </tr>
+            </thead>
+            <tbody id="device-list"></tbody>
+            <tfoot>
+              <tr class="totals-row">
+                <td colspan="4"><strong>Total</strong></td>
+                <td id="tfoot-monthly">₹0.00</td>
+                <td id="tfoot-yearly">₹0.00</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Charts ───────────────────────────────────────────────────────────── -->
+    <section id="charts" class="charts-section" aria-labelledby="charts-heading">
+      <div class="section-inner">
+        <h2 id="charts-heading" class="section-title">Cost Breakdown</h2>
+
+        <div class="chart-tabs" role="tablist" aria-label="Chart type">
+          <button class="tab-btn active" role="tab" aria-selected="true"  data-chart="bar" type="button">Bar Chart</button>
+          <button class="tab-btn"        role="tab" aria-selected="false" data-chart="pie" type="button">Pie Chart</button>
+        </div>
+
+        <div class="chart-panels">
+          <div id="chart-panel-bar" class="chart-panel active" role="tabpanel" aria-label="Bar chart">
+            <canvas id="bar-chart" width="700" height="380" aria-label="Bar chart showing annual cost per appliance"></canvas>
+          </div>
+          <div id="chart-panel-pie" class="chart-panel" role="tabpanel" aria-label="Pie chart" hidden>
+            <canvas id="pie-chart" width="420" height="420" aria-label="Pie chart showing cost share per appliance"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Tips ─────────────────────────────────────────────────────────────── -->
+    <section id="tips" class="tips-section" aria-labelledby="tips-heading">
+      <div class="section-inner">
+        <h2 id="tips-heading" class="section-title">Energy-Saving Tips</h2>
+        <p class="tips-intro">
+          Small habits add up. Here are the most effective ways to cut phantom power in Indian homes.
+        </p>
+        <div id="tips-grid" class="tips-grid" aria-live="polite">
+          <!-- Populated by JS when appliances are added; static fallbacks below -->
+          <article class="tip-card">
+            <span class="tip-icon" aria-hidden="true">🔌</span>
+            <p>Use smart power strips to cut power to idle entertainment systems automatically.</p>
+          </article>
+          <article class="tip-card">
+            <span class="tip-icon" aria-hidden="true">⏰</span>
+            <p>Schedule your Wi-Fi router to power down between midnight and 6 AM.</p>
+          </article>
+          <article class="tip-card">
+            <span class="tip-icon" aria-hidden="true">⭐</span>
+            <p>Choose BEE 5-star rated appliances — they have stricter standby power limits.</p>
+          </article>
+          <article class="tip-card">
+            <span class="tip-icon" aria-hidden="true">📺</span>
+            <p>Your set-top box is likely your biggest standby offender — switch it off at the socket.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <p class="footer-note">
+        Standby wattage data sourced from
+        <abbr title="Bureau of Energy Efficiency">BEE</abbr> India guidelines and
+        Lawrence Berkeley National Laboratory (LBNL).
+        Values are approximate; actual consumption varies by model and usage pattern.
+      </p>
+      <p class="footer-copy">
+        &copy; <span id="footer-year"></span> PhantomPower Estimator &mdash; Built for awareness, not profit.
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Footer year
+    document.getElementById("footer-year").textContent = new Date().getFullYear();
+
+    // Dark mode toggle
+    const toggleBtn  = document.getElementById("theme-toggle");
+    const themeIcon  = toggleBtn.querySelector(".theme-icon");
+    const themeLabel = toggleBtn.querySelector(".theme-label");
+    toggleBtn.addEventListener("click", () => {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      document.documentElement.setAttribute("data-theme", isDark ? "light" : "dark");
+      toggleBtn.setAttribute("aria-pressed", String(!isDark));
+      themeIcon.textContent  = isDark ? "🌙" : "☀️";
+      themeLabel.textContent = isDark ? "Dark Mode" : "Light Mode";
+    });
+
+    // Quantity stepper
+    const qtyInput = document.getElementById("quantity");
+    document.getElementById("qty-dec").addEventListener("click", () => {
+      qtyInput.value = Math.max(1, parseInt(qtyInput.value || 1) - 1);
+    });
+    document.getElementById("qty-inc").addEventListener("click", () => {
+      qtyInput.value = Math.min(99, parseInt(qtyInput.value || 1) + 1);
+    });
+
+    // Chart tab switching
+    document.querySelector(".chart-tabs").addEventListener("click", e => {
+      const btn = e.target.closest(".tab-btn[data-chart]");
+      if (!btn) return;
+      document.querySelectorAll(".chart-tabs .tab-btn").forEach(b => {
+        b.classList.remove("active");
+        b.setAttribute("aria-selected", "false");
+      });
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+      const target = btn.dataset.chart;
+      document.querySelectorAll(".chart-panel").forEach(p => {
+        const isActive = p.id === `chart-panel-${target}`;
+        p.classList.toggle("active", isActive);
+        p.hidden = !isActive;
+      });
+    });
+  </script>
+</body>
+</html>
